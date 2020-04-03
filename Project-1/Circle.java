@@ -45,8 +45,8 @@ public class Circle {
      */
 
     public Circle(Point centre, double rad) {
-        this.setCentre(centre);
-        this.radius = rad;
+        centre.setPoint(centre.getX(), centre.getY());
+        radius = rad;
     }
 
     // =========================
@@ -60,7 +60,7 @@ public class Circle {
      * @param yc  new y-coordinate of the centre
      */
     public void setCentre(double xc, double yc) {
-        this.setCentre(new Point(xc, yc));
+        centre.setPoint(xc,yc);
     }
 
     /**
@@ -69,7 +69,7 @@ public class Circle {
      * @param C  A Point representing the new centre of the circle.
      */
     public void setCentre(Point C) {
-        this.centre = C;
+        centre.setPoint(C.getX(), C.getY());
     }
 
     /**
@@ -78,7 +78,7 @@ public class Circle {
      * @param rad  New radius for the circle.
      */
     public void setRadius(double rad) {
-        this.radius = rad;
+        radius = rad;
     }
 
     /**
@@ -87,7 +87,7 @@ public class Circle {
      * @return The centre of this circle (a Point).
      */
     public Point getCentre(){
-        return this.centre;
+        return centre;
     }
 
     /**
@@ -96,18 +96,7 @@ public class Circle {
      * @return The radius of this circle.
      */
     public double getRadius(){
-        return this.radius;
-    }
-
-    // Added a getter for the x and y co-ordinates of the centre of the circle which invokes the getX and getY
-    // method from the Points class
-
-    public double getCentreX() {
-        return centre.getX();
-    }
-
-    public double getCentreY() {
-        return centre.getY();
+        return radius;
     }
 
     // =========================
@@ -122,7 +111,7 @@ public class Circle {
      *         value of the radius.
      */
     public String toString() {
-        return "[" + getCentreX() + "," + getCentreY() + "], r=" + getRadius();
+        return "[" + centre.getX() + "," + centre.getY() + "], r = " + getRadius();
     }
 
     // ==========================
@@ -141,9 +130,9 @@ public class Circle {
      * @return true if the two circles are equal.
      */
     public boolean equals(Circle c) {
-        return(Math.abs(this.getRadius() - c.getRadius()) <= GEOMTOL &&
-                Math.abs(this.getCentreX() - c.getCentreX()) <= GEOMTOL &&
-                Math.abs(this.getCentreY() - c.getCentreY()) <= GEOMTOL);
+        return(Math.abs(this.radius - c.radius) <= GEOMTOL &&
+                Math.abs(this.centre.getX() - c.centre.getX()) <= GEOMTOL &&
+                Math.abs(this.centre.getY() - c.centre.getY()) <= GEOMTOL);
     }
 
     // Added a method to compute the distance between the centres of two circles
@@ -200,28 +189,31 @@ public class Circle {
      *         1 - this envelops c; 0 - Neither envelops; -1 c envelops this circle ; -2 - identical.
      */
     public int envelops(Circle C) {
-         int env = 0;
 
-         double distance = this.centre.distance(C.getCentre());
-         double radius_1 = this.getRadius();
-         double radius_2 = C.getRadius();
+        int env = 3;
 
-         if (equals(C)) {
-             env = -2;
-         }
-         if (!equals(C)) {
-                 if (distance >= radius_1 + radius_2) {
-                     env = 0;
-                 }
-                 if (distance <= radius_1 - radius_2) {
-                     env = 1;
-                 }
-                 if (distance <= radius_2 - radius_1) {
-                     env = -1;
-                 }
-             }
+        double distance = this.centre.distance(C.getCentre());
+        double radius_1 = this.getRadius();
+        double radius_2 = C.getRadius();
 
-          return env;
+        if (equals(C)) {
+            env = -2;
+
+        } else {
+
+            if (distance >= radius_1 + radius_2) {
+                env = 0;
+
+            } else if (distance < radius_1 - radius_2) {
+                env = 1;
+
+            } else if (distance < radius_2 - radius_1) {
+                env = -1;
+
+            }
+        }
+
+        return env;
     }
 
 
@@ -231,6 +223,38 @@ public class Circle {
     // =======================================================
 
     public static void main(String args[]) {
-        // You need to fill in this method.
+
+        Circle c1 = new Circle(0,0,2);
+        Circle c2 = new Circle(0,0,2);
+
+        // Test toString() function
+        System.out.println("c1: " + c1.toString());
+        System.out.println("c2: " + c2.toString());
+        System.out.println("c1 envelop c2? " + c1.envelops(c2)); // Test envelop() function - should return -2
+
+        // setRadius function
+        c2.setRadius(1);
+
+        System.out.println("c1: " + c1.toString());
+        System.out.println("c2: " + c2.toString());
+        System.out.println("c1 envelop c2? " + c1.envelops(c2)); // Test envelop() function - should return 1
+
+        // setRadius function
+        c2.setRadius(3);
+
+        System.out.println("c1: " + c1.toString());
+        System.out.println("c2: " + c2.toString());
+        System.out.println("c1 envelop c2? " + c1.envelops(c2)); // Test envelop() function - should return -1
+
+        // Test setCentre function
+        c2.setCentre(6,0);
+
+        System.out.println("c1: " + c1.toString());
+        System.out.println("c2: " + c2.toString());
+        System.out.println("c1 envelop c2? " + c1.envelops(c2)); // Test envelop() function - should return 0
+
+        // Test area function - should return about 12.6
+        System.out.println("Area of c1: " + c1.area());
+
     }
 }
