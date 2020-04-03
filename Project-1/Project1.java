@@ -34,134 +34,124 @@ public class Project1 {
      *
      * @param fileName  The name of the file containing the circle data.
      */
+
     public void results(String fileName) {
 
         double x, y, rad;
-        int lineCount = 0;
         circleCounter = 0;
-
-        double maxX = Double.MIN_VALUE;
-        double minX = Double.MAX_VALUE;
-        double maxY = Double.MIN_VALUE;
-        double minY = Double.MAX_VALUE;
-
-        double maxRad = Double.MAX_VALUE;
-        double minRad = Double.MIN_VALUE;
-
-        // Counts number of lines i.e. circles in the file
+        x = 0;
+        y = 0;
+        rad = 0;
 
         try {
             Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)));
 
             while (scanner.hasNext()) {
 
-                lineCount++;
+                x = scanner.nextDouble();
+                y = scanner.nextDouble();
+                rad = scanner.nextDouble();
 
+                if (rad > Point.GEOMTOL) {
+                    circleCounter++;
+                }
             }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
 
-        // Creates an array to store the circles
+            } catch(Exception e) {
+                    System.err.println("An error has occurred - cannot read file.");
+                    e.printStackTrace();
+            }
 
-        Circle[] stored_circles = new Circle[lineCount];
-
+        int circleNum = 1;
+        Circle firstC = new Circle(0,0,0);
+        Circle lastC = new Circle(0,0,0);
+        Circle tempC = new Circle(0,0,0);
+        Circle[] validCircles = new Circle[circleCounter];
+        double[] area = new double[circleCounter];
 
         try {
             Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)));
 
-            int i = 0;
-
-            while(scanner.hasNext()) {
+            while (scanner.hasNext()) {
 
                 x = scanner.nextDouble();
                 y = scanner.nextDouble();
                 rad = scanner.nextDouble();
 
-                // Each value of x,y and rad to used to form a new circle which is stored in the array
+                if (rad > Point.GEOMTOL){
 
-                Circle ith_circle = new Circle(x,y,rad);
-                stored_circles[i] = ith_circle;
-                i = i + 1;
+                    if(circleNum == 1) {
+                        firstC.setRadius(rad);
+                        firstC.setCentre(x,y);
+                    }
 
-                if (rad != 0) {
-                    circleCounter ++;
+                    if (circleNum == circleCounter) {
+                        lastC.setRadius(rad);
+                        lastC.setCentre(x,y);
+                    }
+
+                    tempC.setRadius(rad);
+                    tempC.setCentre(x,y);
+
+                    validCircles[circleNum - 1] = tempC;
+                    area[circleNum - 1] = tempC.area();
+
+                    circleNum++;
                 }
 
-                if (x > maxX) {
-                    maxX = x;
-                }
-                if (y > maxY) {
-                    maxY = y;
-                }
-                if(rad > maxRad) {
-                    maxRad = rad;
-                }
-                if (x < minX) {
-                    minX = x;
-                }
-                if (y < minY) {
-                    minY = y;
-                }
-                if (rad < minRad) {
-                    minRad = rad;
-                }
             }
+
         } catch(Exception e) {
+            System.err.println("An error has occurred - cannot read file.");
             e.printStackTrace();
         }
 
-        // Generate a circle at origin with the maximum radius by using the Circle class
-        // Compute maximum area by invoking the area method in the Circle class
+        envelopsFirstLast = firstC.envelops(lastC);
 
-        Circle bigcircle = new Circle(0,0,maxRad);
-        maxArea = bigcircle.area();
+        maxArea = area[0];
+        minArea = area[0];
+        averageArea = 0;
 
-        // Same approach for the minimum area
+        for (int i = 0; i < circleCounter; i++) {
 
-        Circle smallcircle = new Circle(0,0,minRad);
-        minArea = smallcircle.area();
+            if (area[i] > maxArea) {
+                maxArea = area[i];
+            }
 
-        // Use function averageArea to calculate the average area of the circles in the array
-
-        averageArea = averageArea(stored_circles);
-
-        // Use function areaStandardDeviation to calculate the standard deviation of the areas in the array
-
-        stdArea = areaStandardDeviation(stored_circles);
-
-        // Result of the first circle enveloping the last circle in the array
-
-        envelopsFirstLast = stored_circles[1].envelops(stored_circles[lineCount]);
-
-        // Array to store the values of the area of each circle in the array
-
-        double[] area_circles = new double[lineCount];
-
-        for(int i = 0; i < lineCount ; i++) {
-            double area;
-            area = stored_circles[i].area();
-            area_circles[i] = area;
-
+            if (area[i] < minArea) {
+                minArea = area[i];
+            }
         }
 
-        // Bubble sort the array
-        for (int i = 0; i < lineCount-1; i++)
-            for (int j = 0; j < lineCount-i-1; j++)
-                if (area_circles[j] > area_circles[j+1])
-                {
-                    double temp = area_circles[j];
-                    area_circles[j] = area_circles[j+1];
-                    area_circles[j+1] = temp;
+        averageArea = averageArea(validCircles);
+        stdArea = areaStandardDeviation(validCircles);
+
+        boolean swapped = true;
+
+        while (swapped) {
+
+            swapped = false;
+
+            for (int i = 0; i < circleCounter - 2 ; i++) {
+
+                if (area[i] > area[i+1]) {
+
+                    double temp = area[i+1];
+                    area[i+1] = area[i];
+                    area[i] = temp;
+                    swapped = true;
                 }
+            }
+        }
 
-        // Check for number of elements in the array
-        // Check for even case
+        if (circleCounter % 2 == 0) {
 
-        if (lineCount % 2 != 0)
-            medArea = area_circles[lineCount / 2];
-        else
-            medArea = (area_circles[(lineCount - 1) / 2] + area_circles[lineCount / 2]) / 2.0;
+            medArea = (area[((circleNum/2)) - 1] + area[((circleNum/2) + 1) - 1]) / 2;
+
+        } else {
+
+            medArea = area[(circleNum + 1)/2 - 1];
+        }
     }
 
     /**
@@ -170,12 +160,14 @@ public class Project1 {
      * @param circles  An array if Circles
      */
     public double averageArea(Circle[] circles) {
+
         double total = 0;
 
-        for(int i=0; i<circles.length; i++) {
-            double a;
-            a = circles[i].area();
-            total = total + a;
+        for(int i=0; i < circles.length - 1; i++) {
+
+            double area;
+            area = circles[i].area();
+            total = total + area;
         }
         return (total /circles.length);
     }
@@ -186,15 +178,15 @@ public class Project1 {
      * @param circles  An array of Circles
      */
     public double areaStandardDeviation(Circle[] circles) {
+
         double standardDev = 0, mean, num;
         mean = averageArea(circles);
-        int length = circles.length;
 
-        for(int i=0; i<length; i++) {
+        for(int i=0; i < circles.length - 1; i++) {
             num = circles[i].area();
             standardDev += Math.pow(num - mean, 2);
         }
-        return Math.sqrt(standardDev/length);
+        return Math.sqrt(standardDev/circles.length);
     }
 
     // =======================================================
@@ -207,6 +199,18 @@ public class Project1 {
      * credit if it is implemented in a sensible fashion.
      */
     public static void main(String args[]){
-        // You need to fill in this method.
+
+        Project1 P = new Project1();
+
+        P.results("Project1.data");
+
+        System.out.println("Number of Circles: " + P.circleCounter);
+        System.out.println("First circle envelops the last circle? " + P.envelopsFirstLast);
+        System.out.println("Min area: "+ P.minArea);
+        System.out.println("Max area: " + P.maxArea);
+        System.out.println("Average area: " + P.averageArea);
+        System.out.println("Standard Deviation of area: " + P.stdArea);
+        System.out.println("Medium of area: " + P.medArea);
+
     }
 }
