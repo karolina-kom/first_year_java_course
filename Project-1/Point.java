@@ -54,7 +54,7 @@ public class Point {
     /**
      * Getter for x co-ordinate.
      *
-     * @param  none
+     //* @param  none
      * @return The x co-ordinate of this point.
      */
     public double getX() {
@@ -64,7 +64,7 @@ public class Point {
     /**
      * Getter for y co-ordinate.
      *
-     * @param  none
+     //* @param  none
      * @return The y co-ordinate of this point.
      */
     public double getY() {
@@ -152,6 +152,19 @@ public class Point {
      * credit if it is implemented in a sensible fashion.
      */
     public static void main (String args[]) {
-        // You should fill in this method.
+
+        Point A = new Point(2,2);
+        System.out.println("Point A: " + A);
+        Point B = new Point(3,4);
+        System.out.println("Point B: " + B);
+
+        A.setPoint(1,1);
+        System.out.println(A);
+
+        System.out.println(A.getX());
+        System.out.println(A.getY());
+
+        System.out.println("Distance between A and B: " + A.distance(B));
+
     }
 }
