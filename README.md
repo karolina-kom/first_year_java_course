@@ -4,7 +4,7 @@ Small coding projects for first year university course
 ## Language
 Completed in Java 8
 
-## Date Completed
+## Project Completed
 March 2020
 
 ## Projects
