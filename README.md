@@ -1,5 +1,5 @@
 # first-year-java-course
-Small coding projects for first year university course
+Small coding projects for 1st university course
 
 ## Language
 Completed in Java 8
